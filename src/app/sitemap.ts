@@ -4,7 +4,7 @@ import { COLLECTION_SLUGS } from "@/lib/types";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://thesoundreport.vercel.app";
 
-export default async function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages = ["", "/about", "/contact", "/search", ...COLLECTION_SLUGS.map((c) => `/${c}`)].map((p) => ({
     url: `${siteUrl}${p}`,
     lastModified: new Date()

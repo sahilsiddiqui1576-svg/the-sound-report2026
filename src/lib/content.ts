@@ -103,7 +103,7 @@ export async function readHomepageConfig(): Promise<HomepageConfig> {
       const map = new Map<string, string>();
       if (ids.length) { const { data: entries } = await supabase.from("content_entries").select("id,collection,slug").in("id", ids); entries?.forEach((e:any) => map.set(e.id, `content/${e.collection}/${e.slug}.md`)); }
       const resolve = (id?: string) => id ? map.get(id) : undefined;
-      return { heroArticle: resolve(data.hero_entry_id), featuredArticles: (data.featured_entry_ids ?? []).map((id:string) => ({ article: resolve(id) })).filter(x => x.article), featuredArtist: resolve(data.featured_artist_id), featuredPlaylist: resolve(data.featured_playlist_id), weeklyPick: resolve(data.weekly_pick_id), monthlyReview: resolve(data.monthly_review_id), trendReport: resolve(data.trend_report_id), industryInsight: resolve(data.industry_insight_id), newsletterHeading: data.newsletter_heading ?? undefined, newsletterBody: data.newsletter_body ?? undefined };
+      return { heroArticle: resolve(data.hero_entry_id), featuredArticles: (data.featured_entry_ids ?? []).map((id:string) => ({ article: resolve(id) })).filter((x: { article?: string }) => x.article), featuredArtist: resolve(data.featured_artist_id), featuredPlaylist: resolve(data.featured_playlist_id), weeklyPick: resolve(data.weekly_pick_id), monthlyReview: resolve(data.monthly_review_id), trendReport: resolve(data.trend_report_id), industryInsight: resolve(data.industry_insight_id), newsletterHeading: data.newsletter_heading ?? undefined, newsletterBody: data.newsletter_body ?? undefined };
     }
   }
   const filePath = path.join(CONTENT_ROOT, "settings", "homepage.md");
