@@ -1,27 +1,65 @@
-/**
- * Generates public/search-index.json from every collection's Markdown files.
- * Run automatically before `next build`.
- */
-
 import fs from "fs";
 import path from "path";
-import { getAllEntries } from "../src/lib/content";
+import matter from "gray-matter";
 
-async function buildSearchIndex() {
-  const entries = (await getAllEntries()).map((e) => ({
-    title: e.frontmatter.title,
-    slug: e.frontmatter.slug,
-    collection: e.collection,
-    excerpt: e.frontmatter.excerpt,
-    tags: e.frontmatter.tags,
-    genre: e.frontmatter.genre ?? [],
-    mood: e.frontmatter.mood ?? [],
-    language: e.frontmatter.language ?? [],
-    month: e.frontmatter.month ?? "",
-    year: e.frontmatter.year ?? null,
-    coverImage: e.frontmatter.coverImage,
-    publishDate: e.frontmatter.publishDate,
-  }));
+const CONTENT_ROOT = path.join(process.cwd(), "content");
+
+const COLLECTIONS = [
+  "articles",
+  "monthly-reviews",
+  "weekly-picks",
+  "playlists",
+  "artist-spotlights",
+  "trend-reports",
+  "industry-insights",
+];
+
+function getMarkdownFiles(dir: string): string[] {
+  if (!fs.existsSync(dir)) return [];
+
+  return fs
+    .readdirSync(dir, { withFileTypes: true })
+    .flatMap((entry) => {
+      const fullPath = path.join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        return getMarkdownFiles(fullPath);
+      }
+
+      return entry.isFile() && entry.name.endsWith(".md")
+        ? [fullPath]
+        : [];
+    });
+}
+
+function buildSearchIndex() {
+  const entries: any[] = [];
+
+  for (const collection of COLLECTIONS) {
+    const collectionDir = path.join(CONTENT_ROOT, collection);
+
+    for (const filePath of getMarkdownFiles(collectionDir)) {
+      const file = fs.readFileSync(filePath, "utf8");
+      const { data } = matter(file);
+
+      if (data.draft === true) continue;
+
+      entries.push({
+        title: data.title,
+        slug: data.slug,
+        collection,
+        excerpt: data.excerpt,
+        tags: data.tags ?? [],
+        genre: data.genre ?? [],
+        mood: data.mood ?? [],
+        language: data.language ?? [],
+        month: data.month ?? "",
+        year: data.year ?? null,
+        coverImage: data.coverImage,
+        publishDate: data.publishDate,
+      });
+    }
+  }
 
   const outPath = path.join(
     process.cwd(),
@@ -39,7 +77,4 @@ async function buildSearchIndex() {
   );
 }
 
-buildSearchIndex().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+buildSearchIndex();
