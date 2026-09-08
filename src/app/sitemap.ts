@@ -1,19 +1,6 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
 import { getAllEntries } from "@/lib/content";
 import { COLLECTION_SLUGS } from "@/lib/types";
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://thesoundreport.vercel.app";
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticPages = ["", "/about", "/contact", "/search", ...COLLECTION_SLUGS.map((c) => `/${c}`)].map((p) => ({
-    url: `${siteUrl}${p}`,
-    lastModified: new Date()
-  }));
-
-  const entries = (await getAllEntries()).map((e) => ({
-    url: `${siteUrl}/${e.collection}/${e.frontmatter.slug}`,
-    lastModified: e.frontmatter.updatedDate || e.frontmatter.publishDate
-  }));
-
-  return [...staticPages, ...entries];
-}
+import { getArtists, getLatestCharts, getSongs, getTrends } from "@/lib/music";
+const siteUrl=process.env.NEXT_PUBLIC_SITE_URL||"https://the-sound-report2026.vercel.app";
+export default async function sitemap():Promise<MetadataRoute.Sitemap>{const [entries,songs,artists,charts,trends]=await Promise.all([getAllEntries(),getSongs(),getArtists(),getLatestCharts(100),getTrends()]);const staticPages=["","/about","/contact","/search","/songs","/artists","/charts","/trends",...COLLECTION_SLUGS.map(c=>`/${c}`)].map(url=>({url:`${siteUrl}${url}`,lastModified:new Date()}));const content=entries.map(e=>({url:`${siteUrl}/${e.collection}/${e.frontmatter.slug}`,lastModified:e.frontmatter.updatedDate||e.frontmatter.publishDate}));const music=[...songs.map(s=>({url:`${siteUrl}/songs/${s.slug}`,lastModified:s.release_date?new Date(s.release_date):new Date()})),...artists.map(a=>({url:`${siteUrl}/artists/${a.slug}`,lastModified:new Date()})),...charts.map(c=>({url:`${siteUrl}/charts/${c.id}`,lastModified:new Date(c.captured_at)})),...trends.map(t=>({url:`${siteUrl}/trends/${t.slug}`,lastModified:new Date(t.signal_date)}))];return [...staticPages,...content,...music];}
