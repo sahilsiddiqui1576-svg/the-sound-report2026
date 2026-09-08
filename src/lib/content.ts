@@ -16,19 +16,11 @@ function readCollectionDir(collection: CollectionSlug): string[] {
 
 function trackLinks(title: string, artist: string) {
   const q = encodeURIComponent(`${title} ${artist}`);
-  return {
-    spotify: `https://open.spotify.com/search/${q}`,
-    appleMusic: `https://music.apple.com/in/search?term=${q}`,
-    amazonMusic: `https://music.amazon.in/search/${q}`,
-    youtube: `https://www.youtube.com/results?search_query=${q}`,
-  };
+  return { spotify: `https://open.spotify.com/search/${q}`, appleMusic: `https://music.apple.com/in/search?term=${q}`, amazonMusic: `https://music.amazon.in/search/${q}`, youtube: `https://www.youtube.com/results?search_query=${q}` };
 }
 
 function normalizeTracks(tracks: any[] | undefined) {
-  return (tracks ?? []).map((track) => ({
-    ...track,
-    links: { ...trackLinks(track.title, track.artist), ...(track.links ?? {}) },
-  }));
+  return (tracks ?? []).map((track) => ({ ...track, links: { ...trackLinks(track.title, track.artist), ...(track.links ?? {}) } }));
 }
 
 function markdownEntries(collection: CollectionSlug): ContentEntry[] {
@@ -36,10 +28,7 @@ function markdownEntries(collection: CollectionSlug): ContentEntry[] {
     const filePath = path.join(CONTENT_ROOT, COLLECTIONS[collection].dir, filename);
     const raw = fs.readFileSync(filePath, "utf-8");
     const { data, content } = matter(raw);
-    const frontmatter = {
-      ...(data as BaseFrontmatter),
-      ...(collection === "playlists" ? { tracks: normalizeTracks((data as BaseFrontmatter).tracks) } : {}),
-    } as BaseFrontmatter;
+    const frontmatter = { ...(data as BaseFrontmatter), ...(collection === "playlists" ? { tracks: normalizeTracks((data as BaseFrontmatter).tracks) } : {}) } as BaseFrontmatter;
     return { frontmatter, body: content, collection, readingTimeMinutes: Math.max(1, Math.ceil(readingTime(content).minutes)) } satisfies ContentEntry;
   }).filter((e) => process.env.NODE_ENV === "development" || !e.frontmatter.draft)
     .sort((a,b) => (a.frontmatter.order ?? Number.MAX_SAFE_INTEGER) - (b.frontmatter.order ?? Number.MAX_SAFE_INTEGER) || new Date(b.frontmatter.publishDate).getTime() - new Date(a.frontmatter.publishDate).getTime());
@@ -47,18 +36,14 @@ function markdownEntries(collection: CollectionSlug): ContentEntry[] {
 
 function rowToEntry(row: any): ContentEntry {
   const frontmatter: BaseFrontmatter = {
-    title: row.title, slug: row.slug, publishDate: row.publish_date, updatedDate: row.updated_date,
-    featured: row.featured, draft: row.draft, category: row.category, tags: row.tags ?? [], genre: row.genre ?? [], mood: row.mood ?? [], language: row.language ?? [], month: row.month, year: row.year,
-    coverImage: row.cover_image, coverImageAlt: row.cover_image_alt, excerpt: row.excerpt, author: row.author, order: row.display_order,
-    artistName: row.artist_name, artistImage: row.artist_image, location: row.location, country: row.country, artistLinks: row.artist_links ?? {}, curator: row.curator,
-    spotifyUrl: row.spotify_url, appleMusicUrl: row.apple_music_url, youtubeUrl: row.youtube_url, weekLabel: row.week_label, researchNotes: row.research_notes, tracks: row.tracks ?? [],
-    seoTitle: row.seo_title, seoDescription: row.seo_description, seoImage: row.seo_image, canonicalUrl: row.canonical_url
+    title: row.title, slug: row.slug, publishDate: row.publish_date, updatedDate: row.updated_date, featured: row.featured, draft: row.draft, category: row.category, tags: row.tags ?? [], genre: row.genre ?? [], mood: row.mood ?? [], language: row.language ?? [], month: row.month, year: row.year,
+    coverImage: row.cover_image, coverImageAlt: row.cover_image_alt, excerpt: row.excerpt, author: row.author, order: row.display_order, artistName: row.artist_name, artistImage: row.artist_image, location: row.location, country: row.country, artistLinks: row.artist_links ?? {}, curator: row.curator,
+    spotifyUrl: row.spotify_url, appleMusicUrl: row.apple_music_url, youtubeUrl: row.youtube_url, weekLabel: row.week_label, researchNotes: row.research_notes, tracks: row.tracks ?? [], seoTitle: row.seo_title, seoDescription: row.seo_description, seoImage: row.seo_image, canonicalUrl: row.canonical_url
   };
   return { frontmatter, body: row.body ?? "", collection: row.collection as CollectionSlug, readingTimeMinutes: Math.max(1, Math.ceil(readingTime(row.body ?? "").minutes)) };
 }
 
 export async function getCollectionEntries(collection: CollectionSlug): Promise<ContentEntry[]> {
-  // Playlists are editorial source files and should never disappear because the CMS database is empty/stale.
   if (collection === "playlists") return markdownEntries(collection);
   if (!hasSupabase()) return markdownEntries(collection);
   const supabase = await createClient();
@@ -73,7 +58,6 @@ export async function getAllEntries(): Promise<ContentEntry[]> {
 }
 
 export async function getEntryBySlug(collection: CollectionSlug, slug: string): Promise<ContentEntry | undefined> {
-  // Playlist detail pages also use the editorial Markdown source of truth.
   if (collection === "playlists") return markdownEntries(collection).find((e) => e.frontmatter.slug === slug);
   if (!hasSupabase()) return markdownEntries(collection).find((e) => e.frontmatter.slug === slug);
   const supabase = await createClient();
@@ -150,6 +134,7 @@ export async function readSiteSettings() {
         defaultSeoDescription: data.default_seo_description,
         defaultSeoImage: data.default_seo_image,
         socials,
+        homepage: socials.homepage ?? {},
         contactEmail: socials.contactEmail ?? socials.contact_email ?? emptyContact.contactEmail,
         contactPhone: socials.contactPhone ?? socials.contact_phone ?? emptyContact.contactPhone
       };
@@ -157,14 +142,5 @@ export async function readSiteSettings() {
   }
   const filePath = path.join(CONTENT_ROOT, "settings", "site.md");
   const { data } = matter(fs.readFileSync(filePath, "utf-8"));
-  return {
-    siteName: data.siteName,
-    tagline: data.tagline,
-    founderName: data.founderName,
-    defaultSeoDescription: data.defaultSeoDescription,
-    defaultSeoImage: data.defaultSeoImage,
-    socials: data.socials ?? {},
-    contactEmail: data.contactEmail ?? emptyContact.contactEmail,
-    contactPhone: data.contactPhone ?? emptyContact.contactPhone
-  };
+  return { siteName: data.siteName, tagline: data.tagline, founderName: data.founderName, defaultSeoDescription: data.defaultSeoDescription, defaultSeoImage: data.defaultSeoImage, socials: data.socials ?? {}, homepage: data.homepage ?? data.socials?.homepage ?? {}, contactEmail: data.contactEmail ?? emptyContact.contactEmail, contactPhone: data.contactPhone ?? emptyContact.contactPhone };
 }
