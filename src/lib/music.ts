@@ -1,101 +1,23 @@
 import { createClient } from "@/lib/supabase/server";
 import { hasSupabase } from "@/lib/supabase/env";
 
-export type SongRecord = {
-  id: string;
-  title: string;
-  slug: string;
-  album_title: string | null;
-  release_date: string | null;
-  language: string | null;
-  region: string | null;
-  genre: string | null;
-  label: string | null;
-  cover_image_url: string | null;
-  spotify_url: string | null;
-  apple_music_url: string | null;
-  amazon_music_url: string | null;
-  youtube_url: string | null;
-  editorial_note: string | null;
-  artist: { id: string; name: string; slug: string } | null;
-  score: number | null;
-  rank: number | null;
-  previous_rank: number | null;
-  rank_change: number | null;
-};
-
-const EMPTY: SongRecord[] = [];
-
-function normalizeSong(row: any): SongRecord {
-  const artist = Array.isArray(row.artists) ? row.artists[0] : row.artists;
-  const scoreRows = Array.isArray(row.song_scores) ? row.song_scores : row.song_scores ? [row.song_scores] : [];
-  const score = [...scoreRows].sort((a, b) => String(b.score_date ?? "").localeCompare(String(a.score_date ?? "")))[0];
-  return {
-    id: row.id,
-    title: row.title,
-    slug: row.slug,
-    album_title: row.album_title,
-    release_date: row.release_date,
-    language: row.language,
-    region: row.region,
-    genre: row.genre,
-    label: row.label,
-    cover_image_url: row.cover_image_url,
-    spotify_url: row.spotify_url,
-    apple_music_url: row.apple_music_url,
-    amazon_music_url: row.amazon_music_url,
-    youtube_url: row.youtube_url,
-    editorial_note: row.editorial_note,
-    artist: artist ? { id: artist.id, name: artist.name, slug: artist.slug } : null,
-    score: score?.tsr_score ?? null,
-    rank: score?.rank ?? null,
-    previous_rank: score?.previous_rank ?? null,
-    rank_change: score?.rank_change ?? null,
-  };
-}
-
-export async function getSongs(filters?: { q?: string; language?: string; region?: string; genre?: string }) {
-  if (!hasSupabase()) return EMPTY;
-  const supabase = await createClient();
-  let query = supabase
-    .from("songs")
-    .select("*, artists:artist_id(id,name,slug), song_scores(tsr_score,rank,previous_rank,rank_change,score_date,methodology_version)")
-    .eq("is_active", true);
-
-  if (filters?.language) query = query.eq("language", filters.language);
-  if (filters?.region) query = query.eq("region", filters.region);
-  if (filters?.genre) query = query.eq("genre", filters.genre);
-  if (filters?.q) {
-    const safe = filters.q.replace(/,/g, " ").trim();
-    if (safe) query = query.or(`title.ilike.%${safe}%,album_title.ilike.%${safe}%`);
-  }
-
-  const { data, error } = await query.order("release_date", { ascending: false }).limit(100);
-  if (error || !data) return EMPTY;
-  return data.map(normalizeSong).sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
-}
-
-export async function getSongBySlug(slug: string) {
-  if (!hasSupabase()) return null;
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("songs")
-    .select("*, artists:artist_id(id,name,slug), song_scores(tsr_score,rank,previous_rank,rank_change,score_date,methodology_version)")
-    .eq("slug", slug)
-    .eq("is_active", true)
-    .maybeSingle();
-  if (error || !data) return null;
-  return normalizeSong(data);
-}
-
-export async function getSongFacets() {
-  if (!hasSupabase()) return { languages: [], regions: [], genres: [] };
-  const supabase = await createClient();
-  const { data } = await supabase.from("songs").select("language,region,genre").eq("is_active", true).limit(5000);
-  const unique = (values: (string | null)[]) => [...new Set(values.filter(Boolean) as string[])].sort();
-  return {
-    languages: unique(data?.map((x) => x.language) ?? []),
-    regions: unique(data?.map((x) => x.region) ?? []),
-    genres: unique(data?.map((x) => x.genre) ?? []),
-  };
-}
+export type SongRecord = { id:string; title:string; slug:string; album_title:string|null; release_date:string|null; language:string|null; region:string|null; genre:string|null; label:string|null; cover_image_url:string|null; spotify_url:string|null; apple_music_url:string|null; amazon_music_url:string|null; youtube_url:string|null; editorial_note:string|null; artist:{id:string;name:string;slug:string}|null; score:number|null; rank:number|null; previous_rank:number|null; rank_change:number|null };
+export type ArtistRecord = { id:string; name:string; slug:string; sort_name:string|null; image_url:string|null; bio:string|null; country:string|null; primary_city:string|null; languages:string[]; genres:string[]; labels:string[]; spotify_url:string|null; apple_music_url:string|null; amazon_music_url:string|null; youtube_url:string|null; instagram_url:string|null; website_url:string|null; is_independent:boolean; score:number|null; rank:number|null; rank_change:number|null };
+export type ChartRecord = { id:string; platform:string; platform_slug:string; chart_name:string; chart_slug:string; country:string; region:string|null; language:string|null; chart_date:string; captured_at:string; source_url:string|null; source_type:string; ingestion_status:string };
+export type ChartEntryRecord = { id:string; position:number; previous_position:number|null; peak_position:number|null; weeks_on_chart:number|null; rank_change:number|null; source_title:string|null; source_artist_name:string|null; song:{id:string;title:string;slug:string;artist:string|null}|null };
+export type TrendRecord = { id:string; signal_date:string; name:string; slug:string; category:string; description:string|null; region:string|null; language:string|null; score:number|null; change_percent:number|null; direction:string|null; evidence:Record<string,unknown>; source_urls:string[]; confidence:number|null };
+const EMPTY_SONGS:SongRecord[]=[]; const EMPTY_ARTISTS:ArtistRecord[]=[];
+function latest<T extends {score_date?:string|null}>(rows:T[]|T|null|undefined){const list=Array.isArray(rows)?rows:rows?[rows]:[];return [...list].sort((a,b)=>String(b.score_date??"").localeCompare(String(a.score_date??"")))[0];}
+function normalizeSong(row:any):SongRecord{const artist=Array.isArray(row.artists)?row.artists[0]:row.artists;const score=latest(row.song_scores);return {id:row.id,title:row.title,slug:row.slug,album_title:row.album_title,release_date:row.release_date,language:row.language,region:row.region,genre:row.genre,label:row.label,cover_image_url:row.cover_image_url,spotify_url:row.spotify_url,apple_music_url:row.apple_music_url,amazon_music_url:row.amazon_music_url,youtube_url:row.youtube_url,editorial_note:row.editorial_note,artist:artist?{id:artist.id,name:artist.name,slug:artist.slug}:null,score:score?.tsr_score??null,rank:score?.rank??null,previous_rank:score?.previous_rank??null,rank_change:score?.rank_change??null};}
+function normalizeArtist(row:any):ArtistRecord{const score=latest(row.artist_scores);return {id:row.id,name:row.name,slug:row.slug,sort_name:row.sort_name,image_url:row.image_url,bio:row.bio,country:row.country,primary_city:row.primary_city,languages:row.languages??[],genres:row.genres??[],labels:row.labels??[],spotify_url:row.spotify_url,apple_music_url:row.apple_music_url,amazon_music_url:row.amazon_music_url,youtube_url:row.youtube_url,instagram_url:row.instagram_url,website_url:row.website_url,is_independent:row.is_independent??false,score:score?.tsr_score??null,rank:score?.rank??null,rank_change:score?.rank_change??null};}
+export async function getSongs(filters?:{q?:string;language?:string;region?:string;genre?:string}){if(!hasSupabase())return EMPTY_SONGS;const supabase=await createClient();let query=supabase.from("songs").select("*, artists:artist_id(id,name,slug), song_scores(tsr_score,rank,previous_rank,rank_change,score_date,methodology_version)").eq("is_active",true);if(filters?.language)query=query.eq("language",filters.language);if(filters?.region)query=query.eq("region",filters.region);if(filters?.genre)query=query.eq("genre",filters.genre);if(filters?.q){const safe=filters.q.replace(/,/g," ").trim();if(safe)query=query.or(`title.ilike.%${safe}%,album_title.ilike.%${safe}%`);}const{data,error}=await query.order("release_date",{ascending:false}).limit(100);if(error||!data)return EMPTY_SONGS;return data.map(normalizeSong).sort((a,b)=>(b.score??-1)-(a.score??-1));}
+export async function getSongBySlug(slug:string){if(!hasSupabase())return null;const supabase=await createClient();const{data,error}=await supabase.from("songs").select("*, artists:artist_id(id,name,slug), song_scores(tsr_score,rank,previous_rank,rank_change,score_date,methodology_version)").eq("slug",slug).eq("is_active",true).maybeSingle();return error||!data?null:normalizeSong(data);}
+export async function getSongFacets(){if(!hasSupabase())return{languages:[],regions:[],genres:[]};const supabase=await createClient();const{data}=await supabase.from("songs").select("language,region,genre").eq("is_active",true).limit(5000);const unique=(v:(string|null)[])=>[...new Set(v.filter(Boolean)as string[])].sort();return{languages:unique(data?.map(x=>x.language)??[]),regions:unique(data?.map(x=>x.region)??[]),genres:unique(data?.map(x=>x.genre)??[])};}
+export async function getArtists(filters?:{q?:string;language?:string;genre?:string;independent?:string}){if(!hasSupabase())return EMPTY_ARTISTS;const supabase=await createClient();let query=supabase.from("artists").select("*, artist_scores(tsr_score,rank,rank_change,score_date,methodology_version)").eq("is_active",true);if(filters?.language)query=query.contains("languages",[filters.language]);if(filters?.genre)query=query.contains("genres",[filters.genre]);if(filters?.independent==="true")query=query.eq("is_independent",true);if(filters?.q){const safe=filters.q.replace(/,/g," ").trim();if(safe)query=query.or(`name.ilike.%${safe}%,sort_name.ilike.%${safe}%`);}const{data,error}=await query.order("name").limit(250);if(error||!data)return EMPTY_ARTISTS;return data.map(normalizeArtist).sort((a,b)=>(b.score??-1)-(a.score??-1)||a.name.localeCompare(b.name));}
+export async function getArtistBySlug(slug:string){if(!hasSupabase())return null;const supabase=await createClient();const{data,error}=await supabase.from("artists").select("*, artist_scores(tsr_score,rank,rank_change,score_date,methodology_version)").eq("slug",slug).eq("is_active",true).maybeSingle();return error||!data?null:normalizeArtist(data);}
+export async function getArtistSongs(artistId:string){if(!hasSupabase())return EMPTY_SONGS;const supabase=await createClient();const{data,error}=await supabase.from("songs").select("*, artists:artist_id(id,name,slug), song_scores(tsr_score,rank,previous_rank,rank_change,score_date,methodology_version)").eq("artist_id",artistId).eq("is_active",true).order("release_date",{ascending:false}).limit(100);if(error||!data)return EMPTY_SONGS;return data.map(normalizeSong).sort((a,b)=>(b.score??-1)-(a.score??-1));}
+export async function getArtistFacets(){if(!hasSupabase())return{languages:[],genres:[]};const supabase=await createClient();const{data}=await supabase.from("artists").select("languages,genres").eq("is_active",true).limit(5000);const unique=(v:string[][])=>[...new Set(v.flat().filter(Boolean))].sort();return{languages:unique(data?.map(x=>x.languages??[])??[]),genres:unique(data?.map(x=>x.genres??[])??[])};}
+export async function getLatestCharts(limit=30):Promise<ChartRecord[]>{if(!hasSupabase())return[];const supabase=await createClient();const{data,error}=await supabase.from("chart_snapshots").select("id,chart_name,chart_slug,country,region,language,chart_date,captured_at,source_url,source_type,ingestion_status,platforms:platform_id(slug,name)").eq("ingestion_status","verified").order("chart_date",{ascending:false}).order("captured_at",{ascending:false}).limit(limit);if(error||!data)return[];return data.map((r:any)=>({id:r.id,platform:r.platforms?.name??"Platform",platform_slug:r.platforms?.slug??"",chart_name:r.chart_name,chart_slug:r.chart_slug,country:r.country,region:r.region,language:r.language,chart_date:r.chart_date,captured_at:r.captured_at,source_url:r.source_url,source_type:r.source_type,ingestion_status:r.ingestion_status}));}
+export async function getChartById(id:string){if(!hasSupabase())return null;const supabase=await createClient();const{data,error}=await supabase.from("chart_snapshots").select("id,chart_name,chart_slug,country,region,language,chart_date,captured_at,source_url,source_type,ingestion_status,platforms:platform_id(slug,name)").eq("id",id).eq("ingestion_status","verified").maybeSingle();if(error||!data)return null;const r:any=data;const{data:entries}=await supabase.from("chart_entries").select("id,position,previous_position,peak_position,weeks_on_chart,rank_change,source_title,source_artist_name,songs:song_id(id,title,slug,artists:artist_id(name))").eq("snapshot_id",id).order("position").limit(100);return{chart:{id:r.id,platform:r.platforms?.name??"Platform",platform_slug:r.platforms?.slug??"",chart_name:r.chart_name,chart_slug:r.chart_slug,country:r.country,region:r.region,language:r.language,chart_date:r.chart_date,captured_at:r.captured_at,source_url:r.source_url,source_type:r.source_type,ingestion_status:r.ingestion_status},entries:(entries??[]).map((e:any)=>({id:e.id,position:e.position,previous_position:e.previous_position,peak_position:e.peak_position,weeks_on_chart:e.weeks_on_chart,rank_change:e.rank_change,source_title:e.source_title,source_artist_name:e.source_artist_name,song:e.songs?{id:e.songs.id,title:e.songs.title,slug:e.songs.slug,artist:Array.isArray(e.songs.artists)?e.songs.artists[0]?.name??null:e.songs.artists?.name??null}:null})) as ChartEntryRecord[]};}
+export async function getTrends(filters?:{category?:string;region?:string;language?:string}){if(!hasSupabase())return[];const supabase=await createClient();let query=supabase.from("trend_signals").select("*").gte("confidence",60);if(filters?.category)query=query.eq("category",filters.category);if(filters?.region)query=query.eq("region",filters.region);if(filters?.language)query=query.eq("language",filters.language);const{data,error}=await query.order("signal_date",{ascending:false}).order("score",{ascending:false}).limit(100);return error||!data?[]:data as TrendRecord[];}
+export async function getTrendBySlug(slug:string){if(!hasSupabase())return null;const supabase=await createClient();const{data,error}=await supabase.from("trend_signals").select("*").eq("slug",slug).gte("confidence",60).order("signal_date",{ascending:false}).limit(1).maybeSingle();return error||!data?null:data as TrendRecord;}
