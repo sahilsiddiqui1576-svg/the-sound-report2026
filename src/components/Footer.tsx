@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { Instagram, Twitter, Youtube } from "lucide-react";
 import WaveformLogo from "./WaveformLogo";
 
 interface FooterProps {
   siteName: string;
   tagline: string;
   founderName: string;
-  socials: { youtube?: string; instagram?: string; twitter?: string };
+  contactEmail?: string;
+  amazonMusicUrl?: string;
 }
 
 const LINKS = [
@@ -17,7 +17,7 @@ const LINKS = [
   { href: "/about", label: "About" },
 ];
 
-export default function Footer({ siteName, tagline, founderName, socials }: FooterProps) {
+export default function Footer({ siteName, tagline, founderName, contactEmail, amazonMusicUrl }: FooterProps) {
   return (
     <footer className="border-t border-black/5 bg-paper dark:border-white/10 dark:bg-[#0a0a0c]">
       <div className="container-editorial flex flex-col gap-10 py-12 md:flex-row md:items-end md:justify-between">
@@ -33,10 +33,17 @@ export default function Footer({ siteName, tagline, founderName, socials }: Foot
           <nav className="flex flex-wrap gap-x-6 gap-y-2" aria-label="Footer">
             {LINKS.map((link) => <Link key={link.href} href={link.href} className="text-sm font-semibold hover:text-accent">{link.label}</Link>)}
           </nav>
-          <div className="flex gap-3 text-neutral-500 dark:text-neutral-400">
-            {socials.instagram && <a href={socials.instagram} aria-label="Instagram" className="hover:text-accent"><Instagram size={17} /></a>}
-            {socials.twitter && <a href={socials.twitter} aria-label="X / Twitter" className="hover:text-accent"><Twitter size={17} /></a>}
-            {socials.youtube && <a href={socials.youtube} aria-label="YouTube" className="hover:text-accent"><Youtube size={17} /></a>}
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-neutral-500 dark:text-neutral-400">
+            {amazonMusicUrl && (
+              <a href={amazonMusicUrl} target="_blank" rel="noreferrer" className="font-semibold hover:text-accent">
+                Listen on Amazon Music
+              </a>
+            )}
+            {contactEmail && (
+              <a href={`mailto:${contactEmail}`} className="font-semibold hover:text-accent">
+                Contact
+              </a>
+            )}
           </div>
         </div>
       </div>
