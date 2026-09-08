@@ -8,13 +8,14 @@ interface Props { entry: ContentEntry; badge?: string; size?: "sm" | "md" | "lg"
 export default function EditorialCard({ entry, badge, size = "md" }: Props) {
   const { frontmatter, collection } = entry;
   const href = `/${collection}/${frontmatter.slug}`;
-  const aspect = size === "lg" ? "aspect-[4/3]" : size === "sm" ? "aspect-[5/4]" : "aspect-[3/2]";
+  const isPlaylist = collection === "playlists";
+  const aspect = isPlaylist ? "aspect-[16/9]" : size === "lg" ? "aspect-[4/3]" : size === "sm" ? "aspect-[5/4]" : "aspect-[3/2]";
   const label = frontmatter.category || (frontmatter.month ? `${frontmatter.month} ${frontmatter.year ?? ""}` : COLLECTIONS[collection].singularLabel);
 
   return (
     <Link href={href} className="group block border-r border-black/10 last:border-r-0 dark:border-white/10">
-      <div className={`relative ${aspect} overflow-hidden bg-neutral-200 dark:bg-neutral-800`}>
-        <Image src={frontmatter.coverImage} alt={frontmatter.coverImageAlt || frontmatter.title} fill sizes="(max-width: 768px) 100vw, 30vw" className="object-cover transition duration-700 ease-out group-hover:scale-[1.035]" />
+      <div className={`relative w-full ${aspect} overflow-hidden bg-neutral-200 dark:bg-neutral-800`}>
+        <Image src={frontmatter.coverImage} alt={frontmatter.coverImageAlt || frontmatter.title} fill sizes="(max-width: 768px) 100vw, 30vw" className="object-cover transition duration-700 ease-out group-hover:scale-[1.02]" />
       </div>
       <div className="px-4 py-4 sm:px-5">
         <div className="flex items-center justify-between gap-3">
