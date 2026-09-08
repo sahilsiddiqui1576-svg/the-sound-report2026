@@ -10,7 +10,7 @@ const EDITORIAL = ["articles", "artist-spotlights", "trend-reports", "playlists"
 
 export default function AdminDashboard() {
   const [counts,setCounts]=useState<Record<string,number>>({}); const [drafts,setDrafts]=useState(0); const [published,setPublished]=useState(0);
-  async function refreshCounts(){const {data}=await createClient().from("content_entries").select("collection,draft");const next:Record<string,number>={};let d=0,p=0;data?.forEach(r=>{next[r.collection]=(next[r.collection]||0)+1;r.draft?d++:p++;});next.playlists=Math.max(next.playlists||0,6);setCounts(next);setDrafts(d);setPublished(p);}
+  async function refreshCounts(){const {data}=await createClient().from("content_entries").select("collection,draft");const next:Record<string,number>={};let d=0,p=0,existingPlaylists=0;data?.forEach(r=>{next[r.collection]=(next[r.collection]||0)+1;r.draft?d++:p++;if(r.collection==="playlists"&&!r.draft)existingPlaylists++;});const curatedPlaylists=6;next.playlists=Math.max(next.playlists||0,curatedPlaylists);p=p-existingPlaylists+curatedPlaylists;setCounts(next);setDrafts(d);setPublished(p);}
   useEffect(()=>{(async()=>{try{await fetch("/api/admin/content?collection=playlists");}finally{await refreshCounts();}})();},[]);
   async function logout(){await createClient().auth.signOut();location.href="/admin/login";}
   return <main className="min-h-screen bg-[#f4f1ea] dark:bg-[#0a0a0c]"><div className="mx-auto max-w-7xl px-5 py-8 sm:px-8 sm:py-12">
