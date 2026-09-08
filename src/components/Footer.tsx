@@ -6,7 +6,7 @@ interface FooterProps {
   tagline: string;
   founderName: string;
   contactEmail?: string;
-  amazonMusicUrl?: string;
+  contactPhone?: string;
 }
 
 const LINKS = [
@@ -17,7 +17,7 @@ const LINKS = [
   { href: "/about", label: "About" },
 ];
 
-export default function Footer({ siteName, tagline, founderName, contactEmail, amazonMusicUrl }: FooterProps) {
+export default function Footer({ siteName, tagline, founderName, contactEmail, contactPhone }: FooterProps) {
   return (
     <footer className="border-t border-black/5 bg-paper dark:border-white/10 dark:bg-[#0a0a0c]">
       <div className="container-editorial flex flex-col gap-10 py-12 md:flex-row md:items-end md:justify-between">
@@ -33,18 +33,20 @@ export default function Footer({ siteName, tagline, founderName, contactEmail, a
           <nav className="flex flex-wrap gap-x-6 gap-y-2" aria-label="Footer">
             {LINKS.map((link) => <Link key={link.href} href={link.href} className="text-sm font-semibold hover:text-accent">{link.label}</Link>)}
           </nav>
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-neutral-500 dark:text-neutral-400">
-            {amazonMusicUrl && (
-              <a href={amazonMusicUrl} target="_blank" rel="noreferrer" className="font-semibold hover:text-accent">
-                Listen on Amazon Music
-              </a>
-            )}
-            {contactEmail && (
-              <a href={`mailto:${contactEmail}`} className="font-semibold hover:text-accent">
-                Contact
-              </a>
-            )}
-          </div>
+          {(contactEmail || contactPhone) && (
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-neutral-500 dark:text-neutral-400">
+              {contactEmail && (
+                <a href={`mailto:${contactEmail}`} className="font-semibold hover:text-accent">
+                  {contactEmail}
+                </a>
+              )}
+              {contactPhone && (
+                <a href={`tel:${contactPhone.replace(/[^+\d]/g, "")}`} className="font-semibold hover:text-accent">
+                  {contactPhone}
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </div>
       <div className="border-t border-black/5 py-5 dark:border-white/10">
