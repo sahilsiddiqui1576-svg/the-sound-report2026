@@ -37,7 +37,8 @@ export default function FilterBar({ facets }: { facets: Facets }) {
       const params = new URLSearchParams(searchParams.toString());
       if (!value) params.delete(key);
       else params.set(key, value);
-      router.push(`${pathname}?${params.toString()}`, { scroll: false });
+      const query = params.toString();
+      router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
     },
     [router, pathname, searchParams]
   );
@@ -55,8 +56,9 @@ export default function FilterBar({ facets }: { facets: Facets }) {
             <select
               value={searchParams.get(paramKey) ?? ""}
               onChange={(e) => setParam(paramKey, e.target.value)}
-              className="rounded-lg border border-black/10 bg-transparent px-3 py-2 text-sm
-                         focus-visible:outline-2 focus-visible:outline-accent dark:border-white/15"
+              className="rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-ink
+                         focus-visible:outline-2 focus-visible:outline-accent dark:border-white/15
+                         dark:bg-[#161618] dark:text-white"
             >
               <option value="">{LABEL_MAP[key]}: All</option>
               {facets[key].map((v) => (
