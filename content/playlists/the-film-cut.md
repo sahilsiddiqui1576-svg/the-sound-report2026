@@ -10,7 +10,7 @@ tags: ["playlist", "2026"]
 genre: ["Soundtrack", "Hindi", "Punjabi"]
 mood: ["Cinematic", "Essential"]
 language: ["Hindi", "Punjabi", "Urdu"]
-coverImage: ""
+coverImage: "/images/playlists/the-film-cut.svg"
 coverImageAlt: "THE FILM CUT — The Sound Report"
 excerpt: "The Sound Report's soundtrack picks from 2026."
 author: "The Sound Report Editors"
