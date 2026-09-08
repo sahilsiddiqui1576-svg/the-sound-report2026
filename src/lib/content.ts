@@ -112,13 +112,34 @@ export async function readHomepageConfig(): Promise<HomepageConfig> {
   return data as HomepageConfig;
 }
 
-export async function readSiteSettings() {
+export interface SiteSettings {
+  siteName: string;
+  tagline: string;
+  founderName: string;
+  defaultSeoDescription: string;
+  defaultSeoImage: string;
+  contactEmail?: string;
+  amazonMusicUrl?: string;
+}
+
+export async function readSiteSettings(): Promise<SiteSettings> {
   if (hasSupabase()) {
     const supabase = await createClient();
     const { data } = await supabase.from("site_settings").select("*").eq("id", true).maybeSingle();
-    if (data) return { siteName: data.site_name, tagline: data.tagline, founderName: data.founder_name, defaultSeoDescription: data.default_seo_description, defaultSeoImage: data.default_seo_image, socials: data.socials ?? {} };
+    if (data) {
+      const links = data.socials ?? {};
+      return {
+        siteName: data.site_name,
+        tagline: data.tagline,
+        founderName: data.founder_name,
+        defaultSeoDescription: data.default_seo_description,
+        defaultSeoImage: data.default_seo_image,
+        contactEmail: links.contactEmail ?? links.contact_email ?? undefined,
+        amazonMusicUrl: links.amazonMusicUrl ?? links.amazon_music_url ?? undefined
+      };
+    }
   }
   const filePath = path.join(CONTENT_ROOT, "settings", "site.md");
   const { data } = matter(fs.readFileSync(filePath, "utf-8"));
-  return data as { siteName: string; tagline: string; founderName: string; defaultSeoDescription: string; defaultSeoImage: string; socials: { spotify?: string; youtube?: string; instagram?: string; twitter?: string } };
+  return data as SiteSettings;
 }
