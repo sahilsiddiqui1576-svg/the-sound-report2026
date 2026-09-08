@@ -12,7 +12,7 @@ export default function SiteSettingsPage() {
     seoDescription: "",
     seoImage: "/images/hero-crowd.jpg",
     contactEmail: "",
-    amazonMusicUrl: ""
+    contactPhone: ""
   });
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ export default function SiteSettingsPage() {
           seoDescription: data.default_seo_description ?? "",
           seoImage: data.default_seo_image ?? "/images/hero-crowd.jpg",
           contactEmail: links.contactEmail ?? links.contact_email ?? "",
-          amazonMusicUrl: links.amazonMusicUrl ?? links.amazon_music_url ?? ""
+          contactPhone: links.contactPhone ?? links.contact_phone ?? ""
         });
       }
       setLoading(false);
@@ -59,7 +59,7 @@ export default function SiteSettingsPage() {
       default_seo_image: form.seoImage.trim(),
       socials: {
         contactEmail: form.contactEmail.trim(),
-        amazonMusicUrl: form.amazonMusicUrl.trim()
+        contactPhone: form.contactPhone.trim()
       },
       updated_at: new Date().toISOString()
     });
@@ -78,7 +78,7 @@ export default function SiteSettingsPage() {
           <p className="text-xs font-bold uppercase tracking-[.2em] text-accent">The Sound Report</p>
           <h1 className="mt-2 font-display text-4xl font-black">Site Settings</h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-neutral-500 dark:text-neutral-400">
-            Update publication details, contact information and listening links without editing the website code.
+            Update publication details and contact information without editing the website code.
           </p>
         </div>
 
@@ -95,12 +95,11 @@ export default function SiteSettingsPage() {
           </section>
 
           <section className="rounded-3xl border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-white/[.04]">
-            <p className="text-xs font-bold uppercase tracking-[.18em] text-neutral-400">Contact & listening</p>
+            <p className="text-xs font-bold uppercase tracking-[.18em] text-neutral-400">Contact</p>
             <div className="mt-5 grid gap-5 sm:grid-cols-2">
               <Field label="Contact email" type="email" value={form.contactEmail} onChange={(v) => update("contactEmail", v)} placeholder="editor@thesoundreport.com" />
-              <Field label="Amazon Music URL" type="url" value={form.amazonMusicUrl} onChange={(v) => update("amazonMusicUrl", v)} placeholder="https://music.amazon.com/..." />
+              <Field label="Contact phone" type="tel" value={form.contactPhone} onChange={(v) => update("contactPhone", v)} placeholder="+91 98765 43210" />
             </div>
-            <p className="mt-4 text-xs leading-5 text-neutral-400">Social media links are intentionally removed from the public site.</p>
           </section>
 
           <section className="rounded-3xl border border-black/10 bg-white p-6 dark:border-white/10 dark:bg-white/[.04]">
