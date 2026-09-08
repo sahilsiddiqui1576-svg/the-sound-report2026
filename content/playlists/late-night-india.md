@@ -10,7 +10,7 @@ tags: ["playlist", "2026"]
 genre: ["Indie", "R&B", "Pop", "South Asian"]
 mood: ["Late Night", "Intimate", "Essential"]
 language: ["Hindi", "Urdu", "Punjabi", "English"]
-coverImage: ""
+coverImage: "/images/playlists/late-night-india.svg"
 coverImageAlt: "LATE NIGHT INDIA — The Sound Report"
 excerpt: "For drives with nowhere to be, conversations that run too long, and thoughts that get louder after midnight."
 author: "The Sound Report Editors"
