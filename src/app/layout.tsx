@@ -55,7 +55,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             tagline={settings.tagline}
             founderName={settings.founderName}
             contactEmail={settings.contactEmail}
-            amazonMusicUrl={settings.amazonMusicUrl}
+            contactPhone={settings.contactPhone}
           />
         </ThemeProvider>
       </body>
