@@ -113,6 +113,7 @@ export async function readHomepageConfig(): Promise<HomepageConfig> {
 }
 
 export async function readSiteSettings() {
+  const emptyLinks = { contactEmail: "", amazonMusicUrl: "" };
   if (hasSupabase()) {
     const supabase = await createClient();
     const { data } = await supabase.from("site_settings").select("*").eq("id", true).maybeSingle();
@@ -124,24 +125,22 @@ export async function readSiteSettings() {
         founderName: data.founder_name,
         defaultSeoDescription: data.default_seo_description,
         defaultSeoImage: data.default_seo_image,
-        socials: {
-          ...socials,
-          contactEmail: socials.contactEmail ?? socials.contact_email ?? "",
-          amazonMusicUrl: socials.amazonMusicUrl ?? socials.amazon_music_url ?? ""
-        }
+        socials,
+        contactEmail: socials.contactEmail ?? socials.contact_email ?? "",
+        amazonMusicUrl: socials.amazonMusicUrl ?? socials.amazon_music_url ?? ""
       };
     }
   }
   const filePath = path.join(CONTENT_ROOT, "settings", "site.md");
   const { data } = matter(fs.readFileSync(filePath, "utf-8"));
-  return data as {
-    siteName: string;
-    tagline: string;
-    founderName: string;
-    defaultSeoDescription: string;
-    defaultSeoImage: string;
-    contactEmail?: string;
-    amazonMusicUrl?: string;
-    socials?: { contactEmail?: string; amazonMusicUrl?: string };
+  return {
+    siteName: data.siteName,
+    tagline: data.tagline,
+    founderName: data.founderName,
+    defaultSeoDescription: data.defaultSeoDescription,
+    defaultSeoImage: data.defaultSeoImage,
+    socials: data.socials ?? {},
+    contactEmail: data.contactEmail ?? emptyLinks.contactEmail,
+    amazonMusicUrl: data.amazonMusicUrl ?? emptyLinks.amazonMusicUrl
   };
 }
