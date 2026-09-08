@@ -43,6 +43,7 @@ export default function AdminDashboard() {
             <p className="mt-2 max-w-xl text-sm text-neutral-500">Publish the stories, artists, trends and playlists that make up the publication.</p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Link href="/admin/settings" className="rounded-full border border-accent/40 px-4 py-2 text-sm font-semibold hover:bg-accent/5">Site settings</Link>
             <button onClick={importContent} className="rounded-full border border-accent/40 px-4 py-2 text-sm font-semibold">Load bundled content</button>
             <button onClick={logout} className="rounded-full border border-black/10 px-4 py-2 text-sm dark:border-white/10">Sign out</button>
           </div>
