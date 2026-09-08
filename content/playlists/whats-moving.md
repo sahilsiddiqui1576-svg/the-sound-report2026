@@ -10,7 +10,7 @@ tags: ["playlist", "2026"]
 genre: ["Indian", "Punjabi", "Pop", "Hip-Hop"]
 mood: ["Current", "High Energy", "Essential"]
 language: ["Hindi", "Punjabi", "Urdu", "English"]
-coverImage: ""
+coverImage: "/images/playlists/whats-moving.svg"
 coverImageAlt: "WHAT'S MOVING — The Sound Report"
 excerpt: "The songs moving India right now."
 author: "The Sound Report Editors"
