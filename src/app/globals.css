@@ -9,74 +9,31 @@
 }
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-  body {
-    @apply bg-paper text-ink dark:bg-[#0a0a0c] dark:text-neutral-100 font-sans antialiased;
-  }
-  ::selection {
-    @apply bg-accent/30;
-  }
-  :focus-visible {
-    @apply outline-2 outline-offset-2 outline-accent rounded-sm;
-  }
-  h1, h2, h3, h4 {
-    @apply font-display tracking-tight;
-  }
-
-  /* Keep native select menus readable in both themes. */
-  select,
-  select option {
-    color: #111113;
-    background-color: #ffffff;
-    color-scheme: light;
-  }
-  .dark select,
-  .dark select option {
-    color: #f5f5f5;
-    background-color: #161618;
-    color-scheme: dark;
-  }
+  html { scroll-behavior: smooth; }
+  body { @apply bg-paper text-ink dark:bg-[#0a0a0c] dark:text-neutral-100 font-sans antialiased; }
+  ::selection { @apply bg-accent/30; }
+  :focus-visible { @apply outline-2 outline-offset-2 outline-accent rounded-sm; }
+  h1, h2, h3, h4 { @apply font-display tracking-tight; }
+  select, select option { color:#111113; background-color:#fff; color-scheme:light; }
+  .dark select, .dark select option { color:#f5f5f5; background-color:#161618; color-scheme:dark; }
 }
 
 @layer components {
-  .container-editorial {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
-  }
-  .badge {
-    @apply inline-flex items-center gap-1 rounded-full bg-accent/15 px-3 py-1 text-[11px]
-           font-semibold uppercase tracking-wider text-accent;
-  }
-  .pill-btn {
-    @apply inline-flex items-center justify-center rounded-full bg-accent px-6 py-3
-           text-sm font-semibold text-white transition hover:bg-accent-soft hover:text-ink
-           focus-visible:outline-2 focus-visible:outline-accent;
-  }
-  .pill-btn-outline {
-    @apply inline-flex items-center justify-center rounded-full border border-white/25 px-6 py-3
-           text-sm font-semibold text-white transition hover:border-accent hover:text-accent;
-  }
-  .link-arrow {
-    @apply inline-flex items-center gap-1 text-sm font-semibold text-accent transition
-           hover:gap-2;
-  }
-  .card-surface {
-    @apply rounded-2xl border border-black/5 bg-white shadow-sm transition
-           dark:border-white/10 dark:bg-surface-dark;
-  }
+  .container-editorial { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
+  .badge { @apply inline-flex items-center gap-1 bg-accent/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.16em] text-accent; }
+  .pill-btn { @apply inline-flex items-center justify-center rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition hover:bg-accent-soft hover:text-ink focus-visible:outline-2 focus-visible:outline-accent; }
+  .pill-btn-outline { @apply inline-flex items-center justify-center rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:border-accent hover:text-accent; }
+  .link-arrow { @apply inline-flex items-center gap-2 text-sm font-semibold text-accent transition hover:gap-3; }
+  .card-surface { @apply border border-black/10 bg-white transition dark:border-white/10 dark:bg-surface-dark; }
+  .editorial-rule { @apply border-t border-black/10 dark:border-white/10; }
+  .editorial-kicker { @apply text-[10px] font-bold uppercase tracking-[.2em] text-accent; }
+  .editorial-meta { @apply text-[11px] uppercase tracking-[.12em] text-neutral-400; }
 }
 
-/* Respect reduced-motion preference site-wide */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+  *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; scroll-behavior:auto !important; }
 }
 
-.admin-input { margin-top: .45rem; width: 100%; border: 1px solid rgba(0,0,0,.12); border-radius: .75rem; background: transparent; padding: .75rem .85rem; font-size: .9rem; font-weight: 400; outline: none; }
-.dark .admin-input { border-color: rgba(255,255,255,.14); }
-.admin-input:focus { border-color: currentColor; }
+.admin-input { margin-top:.45rem; width:100%; border:1px solid rgba(0,0,0,.12); border-radius:.75rem; background:transparent; padding:.75rem .85rem; font-size:.9rem; font-weight:400; outline:none; }
+.dark .admin-input { border-color:rgba(255,255,255,.14); }
+.admin-input:focus { border-color:currentColor; }
