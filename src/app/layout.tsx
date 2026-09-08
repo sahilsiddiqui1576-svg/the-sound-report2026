@@ -10,30 +10,28 @@ const sans = { variable: "" };
 const display = { variable: "" };
 const mono = { variable: "" };
 
-
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://thesoundreport.vercel.app";
-
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await readSiteSettings();
   return {
-  metadataBase: new URL(siteUrl),
-  title: { default: settings.siteName, template: `%s · ${settings.siteName}` },
-  description: settings.defaultSeoDescription,
-  openGraph: {
-    title: settings.siteName,
+    metadataBase: new URL(siteUrl),
+    title: { default: settings.siteName, template: `%s · ${settings.siteName}` },
     description: settings.defaultSeoDescription,
-    images: [settings.defaultSeoImage],
-    type: "website",
-    siteName: settings.siteName
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: settings.siteName,
-    description: settings.defaultSeoDescription,
-    images: [settings.defaultSeoImage]
-  },
-  icons: { icon: "/favicon.ico" }
+    openGraph: {
+      title: settings.siteName,
+      description: settings.defaultSeoDescription,
+      images: [settings.defaultSeoImage],
+      type: "website",
+      siteName: settings.siteName
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: settings.siteName,
+      description: settings.defaultSeoDescription,
+      images: [settings.defaultSeoImage]
+    },
+    icons: { icon: "/favicon.ico" }
   };
 }
 
@@ -56,7 +54,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             siteName={settings.siteName}
             tagline={settings.tagline}
             founderName={settings.founderName}
-            socials={settings.socials}
+            contactEmail={settings.contactEmail}
+            amazonMusicUrl={settings.amazonMusicUrl}
           />
         </ThemeProvider>
       </body>
