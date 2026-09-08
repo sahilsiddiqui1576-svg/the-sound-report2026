@@ -3,31 +3,6 @@
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { ArrowRight } from "lucide-react";
 
-export default function AdminLoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  async function submit(e: FormEvent) {
-    e.preventDefault(); setLoading(true); setError("");
-    const { error } = await createClient().auth.signInWithPassword({ email, password });
-    if (error) setError(error.message);
-    else router.push("/admin");
-    setLoading(false);
-  }
-
-  return <main className="flex min-h-screen items-center justify-center bg-neutral-50 px-5 dark:bg-[#0a0a0c]">
-    <form onSubmit={submit} className="w-full max-w-md rounded-2xl border border-black/10 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-white/[.04]">
-      <p className="text-xs font-bold uppercase tracking-[.2em] text-accent">The Sound Report</p>
-      <h1 className="mt-2 font-display text-3xl font-black">Admin Login</h1>
-      <p className="mt-2 text-sm text-neutral-500">Private editorial dashboard</p>
-      <label className="mt-7 block text-sm font-semibold">Email<input className="admin-input" type="email" value={email} onChange={e=>setEmail(e.target.value)} required /></label>
-      <label className="mt-4 block text-sm font-semibold">Password<input className="admin-input" type="password" value={password} onChange={e=>setPassword(e.target.value)} required /></label>
-      {error && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-      <button disabled={loading} className="mt-6 w-full rounded-xl bg-black px-5 py-3 text-sm font-bold text-white disabled:opacity-50 dark:bg-white dark:text-black">{loading ? "Signing in…" : "Sign in"}</button>
-    </form>
-  </main>;
-}
+export default function AdminLoginPage(){const router=useRouter();const[email,setEmail]=useState("");const[password,setPassword]=useState("");const[error,setError]=useState("");const[loading,setLoading]=useState(false);async function submit(e:FormEvent){e.preventDefault();setLoading(true);setError("");const{error}=await createClient().auth.signInWithPassword({email,password});if(error)setError(error.message);else router.push("/admin");setLoading(false);}return <main className="grid min-h-screen lg:grid-cols-2"><div className="hidden bg-[#0b0b0d] p-10 text-white lg:flex lg:flex-col lg:justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-accent">The Sound Report · Private</p><h1 className="mt-10 max-w-xl font-display text-7xl font-black uppercase leading-[.8] tracking-[-.065em]">The room<br/>behind<br/><span className="text-accent">the stories.</span></h1></div><p className="text-xs uppercase tracking-[.15em] text-neutral-500">Editorial CMS · 2026</p></div><div className="flex items-center bg-[#f4f1ea] px-5 py-10 dark:bg-[#0a0a0c] sm:px-10"><form onSubmit={submit} className="mx-auto w-full max-w-md"><p className="text-[10px] font-bold uppercase tracking-[.2em] text-accent">Editorial desk</p><h2 className="mt-3 font-display text-4xl font-black uppercase tracking-[-.04em]">Sign in.</h2><p className="mt-3 text-sm leading-6 text-neutral-500 dark:text-neutral-400">Access the private publishing workspace for The Sound Report.</p><label className="mt-9 block text-xs font-bold uppercase tracking-[.1em] text-neutral-500">Email<input className="admin-input" type="email" value={email} onChange={e=>setEmail(e.target.value)} required autoComplete="email"/></label><label className="mt-5 block text-xs font-bold uppercase tracking-[.1em] text-neutral-500">Password<input className="admin-input" type="password" value={password} onChange={e=>setPassword(e.target.value)} required autoComplete="current-password"/></label>{error&&<p role="alert" className="mt-4 border border-red-500/30 bg-red-50 p-3 text-sm text-red-700">{error}</p>}<button disabled={loading} className="mt-7 inline-flex w-full items-center justify-center gap-2 bg-black px-5 py-3.5 text-xs font-bold uppercase tracking-[.14em] text-white transition hover:bg-accent disabled:opacity-50 dark:bg-white dark:text-black">{loading?"Signing in…":"Enter editorial desk"}<ArrowRight size={15}/></button></form></div></main>}
