@@ -1,12 +1,10 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { COLLECTIONS, CollectionSlug } from "@/lib/types";
-import { getCollectionEntries, getFacets } from "@/lib/content";
+import { getCollectionEntries } from "@/lib/content";
 import EditorialCard from "@/components/EditorialCard";
 import ArticleListItem from "@/components/ArticleListItem";
-import FilterBar from "@/components/FilterBar";
 import AnimatedSection from "@/components/AnimatedSection";
-import { Suspense } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -23,17 +21,11 @@ const LIST_STYLE: Record<CollectionSlug, "grid" | "list"> = {
 
 export default async function CollectionPage({ params, searchParams }: { params: Promise<{ collection: string }>; searchParams: Promise<{ genre?: string; mood?: string; language?: string; month?: string; year?: string }> }) {
   const { collection: collectionParam } = await params;
-  const sp = await searchParams;
+  await searchParams;
   const collection = collectionParam as CollectionSlug;
   const meta = COLLECTIONS[collection];
   if (!meta) notFound();
-  let entries = await getCollectionEntries(collection);
-  if (sp.genre) entries = entries.filter((e) => e.frontmatter.genre?.includes(sp.genre as never));
-  if (sp.mood) entries = entries.filter((e) => e.frontmatter.mood?.includes(sp.mood as never));
-  if (sp.language) entries = entries.filter((e) => e.frontmatter.language?.includes(sp.language as never));
-  if (sp.month) entries = entries.filter((e) => e.frontmatter.month === sp.month);
-  if (sp.year) entries = entries.filter((e) => String(e.frontmatter.year) === sp.year);
-  const facets = await getFacets();
+  const entries = await getCollectionEntries(collection);
   const style = LIST_STYLE[collection];
   const lead = entries[0];
   const isPlaylist = collection === "playlists";
@@ -52,18 +44,17 @@ export default async function CollectionPage({ params, searchParams }: { params:
     </section>
 
     <div className="container-editorial py-8 sm:py-10">
-      <Suspense><FilterBar facets={facets} /></Suspense>
-      {entries.length === 0 && <p className="py-16 text-center text-sm text-neutral-500">No stories match these filters yet.</p>}
+      {entries.length === 0 && <p className="py-16 text-center text-sm text-neutral-500">No stories yet.</p>}
       {lead && style === "list" && <section className="mt-10 grid gap-8 border-b border-black/10 pb-10 lg:grid-cols-[1.55fr_.9fr]">
         <EditorialCard entry={lead} size="lg" badge="Lead story" />
         <div className="flex flex-col justify-center"><p className="editorial-kicker">In focus</p><h2 className="mt-3 font-display text-3xl font-black leading-[.95] sm:text-4xl">Stories that move the culture.</h2><p className="mt-4 text-sm leading-6 text-neutral-500">Reporting, ideas and context from across the Indian music landscape.</p></div>
       </section>}
       <section className="mt-10">
-        <div className="mb-3 flex items-end justify-between border-b border-black/10 pb-3"><h2 className="font-display text-2xl font-black uppercase tracking-[-.03em]">{style === "list" ? "Latest" : "Explore"}</h2><span className="editorial-meta">{entries.length} {entries.length === 1 ? "story" : "stories"}</span></div>
+        <div className="mb-3 flex items-end justify-between border-b border-black/10 pb-3"><h2 className="font-display text-2xl font-black uppercase tracking-[-.03em]">{style === "list" ? "Latest" : "Explore"}</h2><span className="editorial-meta">{entries.length} {isPlaylist ? (entries.length === 1 ? "playlist" : "playlists") : (entries.length === 1 ? "story" : "stories")}</span></div>
         {style === "grid" ? (
-          <div className={isPlaylist ? "grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3" : "grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3"}>
+          <div className={isPlaylist ? "grid items-stretch gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3" : "grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3"}>
             {entries.map((entry, i) => (
-              <AnimatedSection key={entry.frontmatter.slug} delay={Math.min(i * .04, .2)}>
+              <AnimatedSection key={entry.frontmatter.slug} delay={Math.min(i * .04, .2)} className="h-full">
                 <EditorialCard entry={entry} size={isPlaylist ? "md" : i === 0 ? "lg" : "md"} />
               </AnimatedSection>
             ))}
