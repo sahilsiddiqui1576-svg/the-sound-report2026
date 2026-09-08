@@ -4,46 +4,29 @@ import { format } from "date-fns";
 import { ContentEntry } from "@/lib/types";
 import { COLLECTIONS } from "@/lib/types";
 
-interface Props {
-  entry: ContentEntry;
-  badge?: string;
-  size?: "sm" | "md" | "lg";
-}
+interface Props { entry: ContentEntry; badge?: string; size?: "sm" | "md" | "lg"; }
 
 export default function EditorialCard({ entry, badge, size = "md" }: Props) {
   const { frontmatter, collection } = entry;
   const href = `/${collection}/${frontmatter.slug}`;
-  const aspect = size === "lg" ? "aspect-[4/3]" : "aspect-square";
+  const aspect = size === "lg" ? "aspect-[4/3]" : size === "sm" ? "aspect-[5/4]" : "aspect-[3/2]";
+  const label = frontmatter.category || (frontmatter.month ? `${frontmatter.month} ${frontmatter.year ?? ""}` : COLLECTIONS[collection].singularLabel);
 
   return (
-    <Link
-      href={href}
-      className="group block overflow-hidden rounded-2xl border border-black/5 bg-white transition
-                 hover:-translate-y-1 hover:shadow-lg dark:border-white/10 dark:bg-surface-dark"
-    >
-      <div className={`relative ${aspect} w-full overflow-hidden bg-neutral-200 dark:bg-neutral-800`}>
-        <Image
-          src={frontmatter.coverImage}
-          alt={frontmatter.coverImageAlt || frontmatter.title}
-          fill
-          sizes="(max-width: 768px) 50vw, 25vw"
-          className="object-cover transition duration-500 group-hover:scale-105"
-        />
-        {badge && (
-          <span className="absolute left-3 top-3 rounded-full bg-black/70 px-3 py-1 text-[10px]
-                            font-semibold uppercase tracking-wider text-accent backdrop-blur">
-            {badge}
-          </span>
-        )}
+    <Link href={href} className="group block">
+      <div className={`relative ${aspect} overflow-hidden bg-neutral-200 dark:bg-neutral-800`}>
+        <Image src={frontmatter.coverImage} alt={frontmatter.coverImageAlt || frontmatter.title} fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover transition duration-700 ease-out group-hover:scale-[1.035]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-80" />
+        {badge && <span className="absolute left-4 top-4 bg-black px-2.5 py-1 text-[9px] font-bold uppercase tracking-[.16em] text-white">{badge}</span>}
       </div>
-      <div className="p-4">
-        <p className="text-xs uppercase tracking-wider text-neutral-400">
-          {frontmatter.month ? `${frontmatter.month} ${frontmatter.year ?? ""}` : COLLECTIONS[collection].singularLabel}
-        </p>
-        <h3 className="mt-1 line-clamp-2 font-display text-base font-bold leading-snug">
-          {frontmatter.title}
-        </h3>
-        <span className="link-arrow mt-2 inline-block">Read Report →</span>
+      <div className="border-b border-black/10 py-4 dark:border-white/10">
+        <div className="flex items-center justify-between gap-3">
+          <p className="editorial-kicker truncate">{label}</p>
+          <span className="editorial-meta shrink-0">{format(new Date(frontmatter.publishDate), "MMM d, yyyy")}</span>
+        </div>
+        <h3 className="mt-2 line-clamp-2 font-display text-xl font-black leading-[1.02] tracking-[-.035em] sm:text-2xl">{frontmatter.title}</h3>
+        {frontmatter.excerpt && <p className="mt-2 line-clamp-2 text-sm leading-5 text-neutral-500 dark:text-neutral-400">{frontmatter.excerpt}</p>}
+        <span className="link-arrow mt-3">Read story <span aria-hidden>↗</span></span>
       </div>
     </Link>
   );
