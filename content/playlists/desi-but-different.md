@@ -10,7 +10,7 @@ tags: ["playlist", "2026"]
 genre: ["Indian", "Pakistani", "South Asian"]
 mood: ["Current", "Essential"]
 language: ["Hindi", "Urdu", "Punjabi", "English"]
-coverImage: ""
+coverImage: "/images/playlists/desi-but-different.svg"
 coverImageAlt: "DESI BUT DIFFERENT — The Sound Report"
 excerpt: "The Sound Report's take on what India sounded like in 2026."
 author: "The Sound Report Editors"
