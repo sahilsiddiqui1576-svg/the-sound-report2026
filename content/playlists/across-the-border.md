@@ -10,7 +10,7 @@ tags: ["playlist", "2026"]
 genre: ["Indian", "Pakistani", "South Asian"]
 mood: ["Cross-border", "Essential"]
 language: ["Hindi", "Urdu", "Punjabi", "English"]
-coverImage: ""
+coverImage: "/images/playlists/across-the-border.svg"
 coverImageAlt: "ACROSS THE BORDER — The Sound Report"
 excerpt: "Sounds from both sides of a shared culture."
 author: "The Sound Report Editors"
