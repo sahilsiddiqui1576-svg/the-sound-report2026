@@ -113,7 +113,7 @@ export async function readHomepageConfig(): Promise<HomepageConfig> {
 }
 
 export async function readSiteSettings() {
-  const emptyLinks = { contactEmail: "", amazonMusicUrl: "" };
+  const emptyContact = { contactEmail: "", contactPhone: "" };
   if (hasSupabase()) {
     const supabase = await createClient();
     const { data } = await supabase.from("site_settings").select("*").eq("id", true).maybeSingle();
@@ -126,8 +126,8 @@ export async function readSiteSettings() {
         defaultSeoDescription: data.default_seo_description,
         defaultSeoImage: data.default_seo_image,
         socials,
-        contactEmail: socials.contactEmail ?? socials.contact_email ?? "",
-        amazonMusicUrl: socials.amazonMusicUrl ?? socials.amazon_music_url ?? ""
+        contactEmail: socials.contactEmail ?? socials.contact_email ?? emptyContact.contactEmail,
+        contactPhone: socials.contactPhone ?? socials.contact_phone ?? emptyContact.contactPhone
       };
     }
   }
@@ -140,7 +140,7 @@ export async function readSiteSettings() {
     defaultSeoDescription: data.defaultSeoDescription,
     defaultSeoImage: data.defaultSeoImage,
     socials: data.socials ?? {},
-    contactEmail: data.contactEmail ?? emptyLinks.contactEmail,
-    amazonMusicUrl: data.amazonMusicUrl ?? emptyLinks.amazonMusicUrl
+    contactEmail: data.contactEmail ?? emptyContact.contactEmail,
+    contactPhone: data.contactPhone ?? emptyContact.contactPhone
   };
 }
