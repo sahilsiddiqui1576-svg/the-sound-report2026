@@ -14,12 +14,32 @@ function readCollectionDir(collection: CollectionSlug): string[] {
   return fs.readdirSync(dir).filter((f) => f.endsWith(".md") || f.endsWith(".mdx"));
 }
 
+function trackLinks(title: string, artist: string) {
+  const q = encodeURIComponent(`${title} ${artist}`);
+  return {
+    spotify: `https://open.spotify.com/search/${q}`,
+    appleMusic: `https://music.apple.com/in/search?term=${q}`,
+    amazonMusic: `https://music.amazon.in/search/${q}`,
+    youtube: `https://www.youtube.com/results?search_query=${q}`,
+  };
+}
+
+function normalizeTracks(tracks: any[] | undefined) {
+  return (tracks ?? []).map((track) => ({
+    ...track,
+    links: { ...trackLinks(track.title, track.artist), ...(track.links ?? {}) },
+  }));
+}
+
 function markdownEntries(collection: CollectionSlug): ContentEntry[] {
   return readCollectionDir(collection).map((filename) => {
     const filePath = path.join(CONTENT_ROOT, COLLECTIONS[collection].dir, filename);
     const raw = fs.readFileSync(filePath, "utf-8");
     const { data, content } = matter(raw);
-    const frontmatter = data as BaseFrontmatter;
+    const frontmatter = {
+      ...(data as BaseFrontmatter),
+      ...(collection === "playlists" ? { tracks: normalizeTracks((data as BaseFrontmatter).tracks) } : {}),
+    } as BaseFrontmatter;
     return { frontmatter, body: content, collection, readingTimeMinutes: Math.max(1, Math.ceil(readingTime(content).minutes)) } satisfies ContentEntry;
   }).filter((e) => process.env.NODE_ENV === "development" || !e.frontmatter.draft)
     .sort((a,b) => (a.frontmatter.order ?? Number.MAX_SAFE_INTEGER) - (b.frontmatter.order ?? Number.MAX_SAFE_INTEGER) || new Date(b.frontmatter.publishDate).getTime() - new Date(a.frontmatter.publishDate).getTime());
@@ -38,6 +58,8 @@ function rowToEntry(row: any): ContentEntry {
 }
 
 export async function getCollectionEntries(collection: CollectionSlug): Promise<ContentEntry[]> {
+  // Playlists are editorial source files and should never disappear because the CMS database is empty/stale.
+  if (collection === "playlists") return markdownEntries(collection);
   if (!hasSupabase()) return markdownEntries(collection);
   const supabase = await createClient();
   const { data, error } = await supabase.from("content_entries").select("*").eq("collection", collection).order("display_order", { ascending: true, nullsFirst: false }).order("publish_date", { ascending: false });
@@ -51,6 +73,8 @@ export async function getAllEntries(): Promise<ContentEntry[]> {
 }
 
 export async function getEntryBySlug(collection: CollectionSlug, slug: string): Promise<ContentEntry | undefined> {
+  // Playlist detail pages also use the editorial Markdown source of truth.
+  if (collection === "playlists") return markdownEntries(collection).find((e) => e.frontmatter.slug === slug);
   if (!hasSupabase()) return markdownEntries(collection).find((e) => e.frontmatter.slug === slug);
   const supabase = await createClient();
   const { data, error } = await supabase.from("content_entries").select("*").eq("collection", collection).eq("slug", slug).maybeSingle();
