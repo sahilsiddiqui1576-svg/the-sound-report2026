@@ -10,7 +10,7 @@ tags: ["playlist", "2026"]
 genre: ["Indian", "Pakistani", "South Asian"]
 mood: ["Nostalgic", "Essential"]
 language: ["Hindi", "Urdu", "Punjabi", "English"]
-coverImage: ""
+coverImage: "/images/playlists/gold-picks.svg"
 coverImageAlt: "GOLD PICKS — The Sound Report"
 excerpt: "India × Pakistan · 2000–2026 · The Sound Report’s personal gold shelf. No rap. No filler."
 author: "The Sound Report Editors"
