@@ -2,53 +2,65 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
 import { Menu, Search, X } from "lucide-react";
+import { useState } from "react";
 import ThemeToggle from "./ThemeToggle";
-import WaveformLogo from "./WaveformLogo";
 
 const NAV = [
   { href: "/", label: "Home" },
   { href: "/articles", label: "Articles" },
   { href: "/artist-spotlights", label: "Artists" },
-  { href: "/trend-reports", label: "Trends" },
+  { href: "/monthly-reviews", label: "Reviews" },
   { href: "/playlists", label: "Playlists" },
   { href: "/about", label: "About" },
 ];
 
-export default function Header({ siteName, tagline }: { siteName: string; tagline: string }) {
+export default function Header({ siteName }: { siteName: string; tagline: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/10 bg-paper/95 dark:border-white/10 dark:bg-[#0a0a0c]/95">
-      <div className="container-editorial flex min-h-[76px] items-center justify-between gap-6">
-        <Link href="/" className="flex min-w-0 items-center gap-3" aria-label={`${siteName} home`}>
-          <WaveformLogo size={25} />
-          <span className="min-w-0">
-            <span className="block truncate font-display text-xl font-black uppercase leading-none tracking-[-.04em] sm:text-2xl">{siteName}</span>
-            <span className="mt-1 hidden max-w-[280px] truncate text-[9px] font-semibold uppercase tracking-[.18em] text-neutral-400 sm:block">{tagline}</span>
-          </span>
+    <header className="sticky top-0 z-50 border-b border-black/10 bg-[#f4f3ee]/95 backdrop-blur-sm dark:border-white/10 dark:bg-[#0b0b0b]/95">
+      <div className="container-editorial grid min-h-[72px] grid-cols-[auto_1fr_auto] items-center gap-5">
+        <Link href="/" aria-label={`${siteName} home`} className="leading-none">
+          <span className="block font-display text-[22px] font-black uppercase leading-[.78] tracking-[-.08em] sm:text-[26px]">The<br />Sound<br />Report</span>
         </Link>
 
-        <nav className="hidden items-center gap-6 lg:flex" aria-label="Primary">
+        <nav className="hidden items-center justify-center gap-7 lg:flex" aria-label="Primary">
           {NAV.map((item) => {
             const active = pathname === item.href || (item.href !== "/" && pathname?.startsWith(item.href));
-            return <Link key={item.href} href={item.href} className={`relative py-3 text-[11px] font-bold uppercase tracking-[.1em] transition after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-accent after:transition-all hover:text-accent hover:after:w-full ${active ? "text-accent after:w-full" : "text-neutral-700 dark:text-neutral-300"}`}>{item.label}</Link>;
+            return (
+              <Link key={item.href} href={item.href} className={`text-[9px] font-bold uppercase tracking-[.05em] transition ${active ? "text-accent" : "text-black dark:text-white"} hover:text-accent`}>
+                {item.label}
+              </Link>
+            );
           })}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-2">
-          <Link href="/search" aria-label="Search" className="hidden h-9 w-9 items-center justify-center border border-black/10 transition hover:border-accent hover:text-accent dark:border-white/15 sm:flex"><Search size={16} /></Link>
+        <div className="flex items-center justify-end gap-2 sm:gap-3">
+          <Link href="/search" aria-label="Search" className="flex h-8 w-8 items-center justify-center rounded-full transition hover:bg-black/5 hover:text-accent dark:hover:bg-white/10">
+            <Search size={16} strokeWidth={1.7} />
+          </Link>
+          <Link href="/#newsletter" className="hidden rounded-full bg-black px-4 py-2 text-[9px] font-bold text-white transition hover:bg-accent sm:inline-flex dark:bg-white dark:text-black dark:hover:bg-accent dark:hover:text-white">Subscribe</Link>
+          <span className="hidden max-w-[88px] text-right text-[7px] font-bold uppercase leading-[1.25] tracking-[.08em] sm:block">Music<br />People<br />Culture<br />A louder tomorrow</span>
           <ThemeToggle />
-          <button type="button" className="flex h-9 w-9 items-center justify-center border border-black/10 dark:border-white/15 lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((v) => !v)}>{open ? <X size={17} /> : <Menu size={17} />}</button>
+          <button type="button" className="flex h-8 w-8 items-center justify-center rounded-full border border-black/10 dark:border-white/15 lg:hidden" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+            {open ? <X size={16} /> : <Menu size={16} />}
+          </button>
         </div>
       </div>
+
       {open && (
-        <nav className="border-t border-black/10 bg-paper dark:border-white/10 dark:bg-[#0a0a0c] lg:hidden" aria-label="Mobile">
-          <ul className="container-editorial grid grid-cols-2 gap-px py-3">
-            {NAV.map((item) => <li key={item.href}><Link href={item.href} onClick={() => setOpen(false)} className="block px-2 py-3 text-xs font-bold uppercase tracking-[.12em] hover:text-accent">{item.label}</Link></li>)}
-            <li><Link href="/search" onClick={() => setOpen(false)} className="block px-2 py-3 text-xs font-bold uppercase tracking-[.12em] hover:text-accent">Search</Link></li>
+        <nav className="border-t border-black/10 bg-[#f4f3ee] dark:border-white/10 dark:bg-[#0b0b0b] lg:hidden" aria-label="Mobile">
+          <ul className="container-editorial grid grid-cols-2 gap-x-6 gap-y-1 py-4">
+            {NAV.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} onClick={() => setOpen(false)} className="block border-b border-black/10 py-3 text-[10px] font-bold uppercase tracking-[.1em] dark:border-white/10">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+            <li><Link href="/search" onClick={() => setOpen(false)} className="block border-b border-black/10 py-3 text-[10px] font-bold uppercase tracking-[.1em] dark:border-white/10">Search</Link></li>
           </ul>
         </nav>
       )}
