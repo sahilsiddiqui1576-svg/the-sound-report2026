@@ -28,7 +28,8 @@ const EMPTY: SongRecord[] = [];
 
 function normalizeSong(row: any): SongRecord {
   const artist = Array.isArray(row.artists) ? row.artists[0] : row.artists;
-  const score = Array.isArray(row.song_scores) ? row.song_scores[0] : row.song_scores;
+  const scoreRows = Array.isArray(row.song_scores) ? row.song_scores : row.song_scores ? [row.song_scores] : [];
+  const score = [...scoreRows].sort((a, b) => String(b.score_date ?? "").localeCompare(String(a.score_date ?? "")))[0];
   return {
     id: row.id,
     title: row.title,
@@ -64,11 +65,13 @@ export async function getSongs(filters?: { q?: string; language?: string; region
   if (filters?.language) query = query.eq("language", filters.language);
   if (filters?.region) query = query.eq("region", filters.region);
   if (filters?.genre) query = query.eq("genre", filters.genre);
-  if (filters?.q) query = query.ilike("title", `%${filters.q}%`);
+  if (filters?.q) {
+    const safe = filters.q.replace(/,/g, " ").trim();
+    if (safe) query = query.or(`title.ilike.%${safe}%,album_title.ilike.%${safe}%`);
+  }
 
   const { data, error } = await query.order("release_date", { ascending: false }).limit(100);
   if (error || !data) return EMPTY;
-
   return data.map(normalizeSong).sort((a, b) => (b.score ?? -1) - (a.score ?? -1));
 }
 
