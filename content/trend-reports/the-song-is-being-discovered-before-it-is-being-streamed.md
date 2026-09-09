@@ -8,8 +8,8 @@ order: 5
 category: "Trend Report"
 tags: ["trend-report", "short-form-video", "reels", "youtube-shorts", "music-discovery", "social-media", "2026"]
 genre: ["Digital Culture", "Music Industry", "Technology"]
-coverImage: "https://images.unsplash.com/photo-1762788110458-0f83628fd223?auto=format&fit=crop&fm=jpg&q=85&w=3840&h=2160"
-coverImageAlt: "Concert crowd holding smartphones while filming a performance"
+coverImage: "https://images.unsplash.com/photo-1766404848255-5c97f6457b08?auto=format&fit=crop&fm=jpg&q=85&w=3840&h=2160"
+coverImageAlt: "Smartphone recording a live music performance"
 excerpt: "Short-form video is changing the path a song takes to an audience. Music discovery increasingly happens on social platforms before listeners arrive on streaming services."
 author: "The Sound Report Editors"
 seoTitle: "The Song Is Being Discovered Before It Is Being Streamed"
