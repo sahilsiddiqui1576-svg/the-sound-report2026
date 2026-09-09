@@ -8,8 +8,8 @@ order: 1
 category: "Trend Report"
 tags: ["trend-report", "music-industry", "india", "streaming", "live-music", "monetisation", "2026"]
 genre: ["Industry", "Music Business"]
-coverImage: "https://images.unsplash.com/photo-1762788110458-0f83628fd223?auto=format&fit=crop&fm=jpg&q=85&w=3840&h=2160"
-coverImageAlt: "Live music audience holding phones at a concert"
+coverImage: "https://images.unsplash.com/photo-1774377767450-d647b609fc7f?auto=format&fit=crop&fm=jpg&q=85&w=3840&h=2160"
+coverImageAlt: "Indian singer performing live on stage"
 excerpt: "India's music business is growing, but the biggest change may be happening outside traditional streaming revenue."
 author: "The Sound Report Editors"
 seoTitle: "India's Music Economy Is Growing, But Streaming Is Only Part of the Story"
