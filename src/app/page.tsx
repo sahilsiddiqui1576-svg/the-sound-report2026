@@ -15,7 +15,7 @@ export default async function HomePage() {
 
   const featured = (hp.heroSlug ? articles.find((entry) => entry.frontmatter.slug === hp.heroSlug) : undefined) ?? articles.find((entry) => entry.frontmatter.featured) ?? articles[0];
   const supporting = articles.filter((entry) => entry !== featured).slice(0, 3);
-  const latest = articles.slice(0, 3);
+  const latest = trends.slice(0, 3);
   const playlistPicks = playlists.slice(0, 4);
   const heroImage = hp.heroImage || featured?.frontmatter.coverImage;
 
@@ -47,7 +47,7 @@ export default async function HomePage() {
 
       <section className="container-editorial py-14 sm:py-18 lg:py-20">
         <div className="grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)]">
-          <div><p className="editorial-kicker">The latest</p><h2 className="mt-4 max-w-[190px] font-display text-5xl font-black uppercase leading-[.84] tracking-[-.06em] sm:text-6xl">{splitHeading(hp.latestHeading || "More Music. Better Days.")}</h2><MoveDownRight className="mt-7" size={28} strokeWidth={1.5} /></div>
+          <div><p className="editorial-kicker">The trends</p><h2 className="mt-4 max-w-[190px] font-display text-5xl font-black uppercase leading-[.84] tracking-[-.06em] sm:text-6xl">{splitHeading(hp.latestHeading || "More Music. Better Days.")}</h2><MoveDownRight className="mt-7" size={28} strokeWidth={1.5} /></div>
           <div className="grid border-t border-black/10 sm:grid-cols-3">{latest.map((entry) => <EditorialCard key={entry.frontmatter.slug} entry={entry} />)}</div>
         </div>
         {hp.latestSubheading && <p className="mt-6 ml-[220px] max-w-xl text-sm leading-6 text-neutral-500 lg:block">{hp.latestSubheading}</p>}
