@@ -49,7 +49,21 @@ export async function getCollectionEntries(collection: CollectionSlug): Promise<
   const supabase = await createClient();
   const { data, error } = await supabase.from("content_entries").select("*").eq("collection", collection).order("display_order", { ascending: true, nullsFirst: false }).order("publish_date", { ascending: false });
   if (error || !data) return markdownEntries(collection);
-  return data.filter((r) => process.env.NODE_ENV === "development" || !r.draft).map(rowToEntry);
+
+  const dbEntries = data.filter((r) => process.env.NODE_ENV === "development" || !r.draft).map(rowToEntry);
+
+  // Trend reports are editorially authored in the repository. Merge matching database
+  // edits over the markdown source, but only expose the current markdown slugs. This
+  // lets new reports appear immediately while retired reports disappear cleanly.
+  if (collection === "trend-reports") {
+    const mdEntries = markdownEntries(collection);
+    const bySlug = new Map(dbEntries.map((entry) => [entry.frontmatter.slug, entry]));
+    return mdEntries
+      .map((entry) => bySlug.get(entry.frontmatter.slug) ?? entry)
+      .sort((a,b) => (a.frontmatter.order ?? Number.MAX_SAFE_INTEGER) - (b.frontmatter.order ?? Number.MAX_SAFE_INTEGER) || new Date(b.frontmatter.publishDate).getTime() - new Date(a.frontmatter.publishDate).getTime());
+  }
+
+  return dbEntries;
 }
 
 export async function getAllEntries(): Promise<ContentEntry[]> {
@@ -61,6 +75,15 @@ export async function getEntryBySlug(collection: CollectionSlug, slug: string): 
   if (collection === "playlists") return markdownEntries(collection).find((e) => e.frontmatter.slug === slug);
   if (!hasSupabase()) return markdownEntries(collection).find((e) => e.frontmatter.slug === slug);
   const supabase = await createClient();
+
+  if (collection === "trend-reports") {
+    const markdownEntry = markdownEntries(collection).find((e) => e.frontmatter.slug === slug);
+    if (!markdownEntry) return undefined;
+    const { data, error } = await supabase.from("content_entries").select("*").eq("collection", collection).eq("slug", slug).maybeSingle();
+    if (!error && data && (process.env.NODE_ENV === "development" || !data.draft)) return rowToEntry(data);
+    return markdownEntry;
+  }
+
   const { data, error } = await supabase.from("content_entries").select("*").eq("collection", collection).eq("slug", slug).maybeSingle();
   if (error || !data || (process.env.NODE_ENV !== "development" && data.draft)) return undefined;
   return rowToEntry(data);
